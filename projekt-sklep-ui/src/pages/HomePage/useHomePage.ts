@@ -1,12 +1,13 @@
 import { useEffect } from 'react'
 
 import { useApp } from '../../context/AppContext'
-import { productService, categoryService, cartService } from '../../services'
-import type { Product } from '../../types'
+import { useCart } from '../../hooks/useCart'
+import { productService, categoryService } from '../../services'
 
 export const useHomePage = () => {
-  const { state, setProducts, setCategories, setLoading, setError, setCart } = useApp()
+  const { state, setProducts, setCategories, setLoading, setError } = useApp()
   const { products, isLoading } = state
+  const { addToCart } = useCart()
 
   // Załaduj dane przy pierwszym renderze
   useEffect(() => {
@@ -38,25 +39,11 @@ export const useHomePage = () => {
     loadData()
   }, [products.length, setProducts, setCategories, setLoading, setError])
 
-  const handleAddToCart = async (product: Product) => {
-    try {
-      await cartService.addToCart(product.id, 1)
-
-      // Odśwież koszyk
-      const cart = await cartService.getCart()
-      setCart(cart)
-    }
-    catch (error) {
-      setError('Błąd podczas dodawania do koszyka')
-      console.error('Failed to add to cart:', error)
-    }
-  }
-
   const featuredProducts = products.slice(0, 6)
 
   return {
     featuredProducts,
     isLoading,
-    handleAddToCart,
+    handleAddToCart: addToCart,
   }
 }

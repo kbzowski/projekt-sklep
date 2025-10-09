@@ -1,14 +1,43 @@
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 
+import { useApp } from '../../context/AppContext'
 import { NAV_ITEMS, ROUTES } from '../../lib/routes'
+import { authService } from '../../services'
 import Button from '../Button'
 import styles from '../Layout/Layout.module.css'
 
-import { useHeader } from './useHeader'
 
 export default function Header() {
-  const { user, cart, handleLogout } = useHeader()
+  const { state, setUser, setCart } = useApp()
+  const { user, cart } = state
+  const navigate = useNavigate()
   const location = useLocation()
+
+  /**
+   * Handler wylogowania użytkownika
+   *
+   * Proces wylogowania:
+   * 1. Wywołaj endpoint /auth/logout (usuwa refresh token z bazy)
+   * 2. Wyczyść dane użytkownika i koszyka z Context
+   * 3. Przekieruj na stronę logowania z informacją o poprzedniej lokalizacji
+   *    (umożliwia powrót po ponownym zalogowaniu)
+   */
+  const handleLogout = async () => {
+    try {
+      await authService.logout()
+      setUser(null)
+      setCart([])
+
+      // Navigate to login with current location for potential redirect back
+      navigate(ROUTES.LOGIN, {
+        state: { from: location.pathname },
+        replace: true,
+      })
+    }
+    catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
 
   const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0)
 

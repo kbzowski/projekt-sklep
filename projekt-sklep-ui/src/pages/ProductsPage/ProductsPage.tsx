@@ -1,9 +1,9 @@
+import styles from './ProductsPage.module.css'
+import { useProductsPage } from './useProductsPage'
 import Pagination from '../../components/Pagination'
 import ProductCard from '../../components/ProductCard'
 import ProductFilters from '../../components/ProductFilters'
 
-import styles from './ProductsPage.module.css'
-import { useProductsPage } from './useProductsPage'
 
 export default function ProductsPage() {
   const {

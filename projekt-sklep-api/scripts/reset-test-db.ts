@@ -5,8 +5,9 @@
  * Used before running e2e tests to ensure consistent test data.
  */
 
-import { PrismaClient } from '@prisma/client';
 import { execSync } from 'child_process';
+
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient({
   datasources: {

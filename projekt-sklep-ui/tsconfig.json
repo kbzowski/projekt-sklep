@@ -1,7 +1,18 @@
 {
+  // === Główna konfiguracja TypeScript dla projektu frontendowego (Vite + React) ===
+
+  // Pusta lista plików - ten plik jest tylko koordynatorem
+  // Używa "Project References" zamiast bezpośredniej kompilacji
   "files": [],
+
+  // === TypeScript Project References ===
+  // Dzieli projekt na niezależne części, które są kompilowane osobno
   "references": [
+    // Konfiguracja dla kodu aplikacji (src/*) - komponenty React, logika biznesowa
     { "path": "./tsconfig.app.json" },
+
+    // Konfiguracja dla narzędzi Node.js (vite.config.ts, vitest.config.ts)
+    // Osobna konfiguracja bo te pliki działają w środowisku Node, nie w przeglądarce
     { "path": "./tsconfig.node.json" }
   ]
 }

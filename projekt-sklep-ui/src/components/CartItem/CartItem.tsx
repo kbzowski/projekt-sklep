@@ -1,4 +1,4 @@
-import styles from '../../pages/CartPage/CartPage.module.css'
+import styles from './CartItem.module.css'
 import type { CartItem as CartItemType } from '../../types'
 import Button from '../Button'
 

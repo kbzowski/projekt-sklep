@@ -1,29 +1,86 @@
 {
   "compilerOptions": {
+    // === Cache i optymalizacja ===
+    // Plik z informacjami o poprzedniej kompilacji - przyspiesza kolejne buildy
+    // Trzymany w node_modules/.tmp żeby nie zaśmiecać głównego katalogu
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+
+    // === Docelowa wersja JavaScript ===
     "target": "ES2022",
+
+    // Zmienia zachowanie pól klas na zgodne ze standardem ES - używa Object.defineProperty
+    // Ważne dla poprawnego działania React Compiler i nowoczesnych wzorców
     "useDefineForClassFields": true,
+
+    // Biblioteki typów dostępne w kodzie:
+    // - ES2022: typy dla nowoczesnego JavaScript (Promise, Array, Map, etc.)
+    // - DOM: typy dla przeglądarki (document, window, HTMLElement, etc.)
+    // - DOM.Iterable: typy dla iteratorów DOM (NodeList, HTMLCollection)
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
+
+    // System modułów - ESNext używa import/export (najbardziej nowoczesny standard)
     "module": "ESNext",
+
+    // Typy specyficzne dla Vite (import.meta.env, import.meta.hot, etc.)
     "types": ["vite/client"],
+
+    // Pomija sprawdzanie typów w plikach .d.ts z node_modules - przyspiesza kompilację
     "skipLibCheck": true,
 
-    /* Bundler mode */
+    /* === Tryb Bundlera (Vite) === */
+    // Rozwiązywanie modułów w trybie bundlera - pozwala Vite na optymalizację importów
+    // Wspiera skomplikowane przypadki jak import z pakietów npm z wieloma entry points
     "moduleResolution": "bundler",
+
+    // Pozwala importować pliki .ts/.tsx bezpośrednio - Vite sam je przetworzy
+    // Normalnie TypeScript by to zablokował, ale w Vite to działa
     "allowImportingTsExtensions": true,
+
+    // Wymusza dokładną składnię import/export bez domyślnych zachowań
     "verbatimModuleSyntax": true,
+
+    // Wymusza traktowanie WSZYSTKICH plików jako moduły ES (nawet bez import/export)
+    // Zapobiega przypadkowemu utworzeniu skryptów globalnych
     "moduleDetection": "force",
+
+    // Nie generuje plików .js - Vite sam się tym zajmuje podczas budowania
+    // TypeScript używany tylko do sprawdzania typów
     "noEmit": true,
+
+    // Transformacja JSX do React.createElement (wersja automatyczna bez import React)
+    // React 17+ nie wymaga już "import React from 'react'" w każdym pliku
     "jsx": "react-jsx",
+
+    // Pozwala importować pliki JSON bezpośrednio jako moduły
+    // import data from './config.json' - data będzie miało typy
     "resolveJsonModule": true,
 
-    /* Linting */
+    /* === Linting - Ścisłe sprawdzanie kodu === */
+    // Włącza wszystkie ścisłe sprawdzania (strictNullChecks, strictFunctionTypes, etc.)
+    // Łapie wiele potencjalnych błędów już na etapie kompilacji
     "strict": true,
+
+    // Błąd gdy zdefiniujemy zmienną lokalną i jej nie użyjemy
+    // Pomaga utrzymać kod czysty i bez martwego kodu
     "noUnusedLocals": true,
+
+    // Błąd gdy funkcja przyjmuje parametr, którego nie używamy
+    // Pomaga wykryć zbędne parametry
     "noUnusedParameters": true,
+
+    // Wymusza tylko składnię TypeScript, która może być usunięta bez zmiany zachowania
+    // Ważne dla React Compiler - zapobiega problemom z niekompatybilną składnią
     "erasableSyntaxOnly": true,
+
+    // Błąd gdy w switch case brakuje break/return i wykonanie "przejdzie" do kolejnego case
     "noFallthroughCasesInSwitch": true,
+
+    // Sprawdza czy importy nie powodują efektów ubocznych gdy ich nie używamy
+    // Zapobiega przypadkowemu wykonaniu kodu przy imporcie
     "noUncheckedSideEffectImports": true
   },
+
+  // Kompiluje wszystkie pliki z katalogu src/
+  // To tutaj znajduje się cały kod aplikacji React
   "include": ["./src"]
 }

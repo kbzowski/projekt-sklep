@@ -1,4 +1,14 @@
 {
+  // === Konfiguracja TypeScript dla procesu budowania produkcyjnego ===
+
+  // Dziedziczy wszystkie ustawienia z głównego tsconfig.json
+  // Pozwala uniknąć duplikacji konfiguracji
   "extends": "./tsconfig.json",
+
+  // Wyklucza z kompilacji produkcyjnej:
+  // - node_modules - biblioteki zewnętrzne (już skompilowane)
+  // - test - pliki testowe (niepotrzebne w produkcji)
+  // - dist - katalog wyjściowy (unikamy rekurencyjnej kompilacji)
+  // - **/*spec.ts - wszystkie pliki testowe (testy jednostkowe NestJS)
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 }

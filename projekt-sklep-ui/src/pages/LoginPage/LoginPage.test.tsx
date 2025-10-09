@@ -14,18 +14,14 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+import LoginPage from './LoginPage'
+import { useLoginPage } from './useLoginPage'
 import { renderWithProviders } from '../../test/utils'
 
-import LoginPage from './LoginPage'
-
- 
 // Mock dla hooka useLoginPage
 vi.mock('./useLoginPage', () => ({
   useLoginPage: vi.fn(),
 }))
-
-// Import zmockowanego hooka
-import { useLoginPage } from './useLoginPage'
 
 describe('LoginPage Component', () => {
   /**

@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
 
+import { useRegisterPage } from './useRegisterPage'
 import Button from '../../components/Button'
 import { ROUTES } from '../../lib/routes'
+import styles from '../../styles/Auth.module.css'
 
-import styles from './Auth.module.css'
-import { useRegisterPage } from './useRegisterPage'
 
 /**
  * RegisterPage with React Router v6 best practices

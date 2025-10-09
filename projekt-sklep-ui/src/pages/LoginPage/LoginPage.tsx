@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
 
+import { useLoginPage } from './useLoginPage'
 import Button from '../../components/Button'
 import { ROUTES } from '../../lib/routes'
+import styles from '../../styles/Auth.module.css'
 
-import styles from './Auth.module.css'
-import { useLoginPage } from './useLoginPage'
 
 /**
  * LoginPage with React Router v6 best practices

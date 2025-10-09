@@ -1,9 +1,9 @@
 import React, { Component, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
+import styles from './ErrorBoundary.module.css'
 import { ROUTES } from '../../lib/routes'
 
-import styles from './ErrorBoundary.module.css'
 
 interface Props {
   children: ReactNode

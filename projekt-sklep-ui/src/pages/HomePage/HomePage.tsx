@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 
-import ProductCard from '../../components/ProductCard'
 
 import styles from './HomePage.module.css'
 import { useHomePage } from './useHomePage'
+import ProductCard from '../../components/ProductCard'
 
 export default function HomePage() {
   const { featuredProducts, isLoading, handleAddToCart } = useHomePage()

@@ -1,5 +1,4 @@
 import type { Product } from '../types'
-
 import { apiClient } from './apiClient'
 
 export interface CartItem {

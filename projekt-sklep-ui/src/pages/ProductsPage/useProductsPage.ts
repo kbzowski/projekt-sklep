@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 
 import { useApp } from '../../context/AppContext'
-import { productService, categoryService, cartService } from '../../services'
-import type {Product, ProductOrderBy} from '../../types'
+import { useCart } from '../../hooks/useCart'
+import { productService, categoryService } from '../../services'
+import type { ProductOrderBy } from '../../types'
 
 /**
  * useProductsPage - custom hook orkiestrujący logikę strony produktów
@@ -30,7 +31,6 @@ export const useProductsPage = () => {
     setCategories,
     setLoading,
     setError,
-    setCart,
     setCategoryFilter,
     setSortBy,
     setPage,
@@ -48,6 +48,8 @@ export const useProductsPage = () => {
     isLoading,
   } = state
 
+  const { addToCart } = useCart()
+
   /**
    * Effect 1: Ładowanie kategorii przy mount komponentu
    *
@@ -56,7 +58,7 @@ export const useProductsPage = () => {
    *
    * useEffect dependencies:
    * - categories.length - sprawdza czy już załadowane
-   * - setCategories - setter z useCallback, stabilna referencja
+   * - setCategories - setter z kontekstu (React Compiler zapewnia stabilną referencję)
    */
   useEffect(() => {
     const loadCategories = async () => {
@@ -119,30 +121,6 @@ export const useProductsPage = () => {
   }, [currentCategory, sortBy, currentPage, itemsPerPage, setProducts, setPagination, setLoading, setError])
 
   /**
-   * Handler: Dodawanie produktu do koszyka
-   *
-   * Flow:
-   * 1. Wywołaj API: POST /cart (dodaj produkt lub zwiększ quantity)
-   * 2. Odśwież stan koszyka: GET /cart (pobierz zaktualizowany koszyk)
-   * 3. Zaktualizuj Context (setCart) → UI automatycznie re-renderuje
-   *
-   * Error handling: wyświetl błąd w UI (setError)
-   */
-  const handleAddToCart = async (product: Product) => {
-    try {
-      await cartService.addToCart(product.id, 1)
-
-      // Odśwież koszyk po dodaniu produktu
-      const cart = await cartService.getCart()
-      setCart(cart)
-    }
-    catch (error) {
-      setError('Błąd podczas dodawania do koszyka')
-      console.error('Failed to add to cart:', error)
-    }
-  }
-
-  /**
    * Handler: Zmiana kategorii filtrującej
    * setCategoryFilter automatycznie resetuje currentPage do 1 (patrz AppContext)
    */
@@ -173,6 +151,8 @@ export const useProductsPage = () => {
    * - Actions (handlery do obsługi interakcji użytkownika)
    *
    * Dzięki temu komponent jest "głupi" - tylko renderuje UI i wywołuje handlery
+   *
+   * handleAddToCart pochodzi z useCart() - reużywalny hook dla operacji koszyka
    */
   return {
     // State
@@ -184,7 +164,7 @@ export const useProductsPage = () => {
     totalPages,
     isLoading,
     // Actions
-    handleAddToCart,
+    handleAddToCart: addToCart,
     handleCategoryChange,
     handleSortChange,
     handlePageChange,

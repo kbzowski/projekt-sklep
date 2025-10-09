@@ -1,5 +1,4 @@
 import type {Product, ProductOrderBy} from '../types'
-
 import { apiClient } from './apiClient'
 
 export interface ProductsResponse {

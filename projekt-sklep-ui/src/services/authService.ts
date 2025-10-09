@@ -1,5 +1,4 @@
 import type { User } from '../types'
-
 import { apiClient } from './apiClient'
 
 export const authService = {

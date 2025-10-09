@@ -1,5 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 
+import Layout from './Layout'
+import ProtectedRoute from './ProtectedRoute'
 import { ROUTES } from '../lib/routes'
 import CartPage from '../pages/CartPage'
 import HomePage from '../pages/HomePage'
@@ -8,8 +10,6 @@ import NotFoundPage from '../pages/NotFoundPage'
 import ProductsPage from '../pages/ProductsPage'
 import RegisterPage from '../pages/RegisterPage'
 
-import Layout from './Layout'
-import ProtectedRoute from './ProtectedRoute'
 
 /**
  * AppRouter - definicje wszystkich tras w aplikacji

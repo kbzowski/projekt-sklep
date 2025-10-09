@@ -1,26 +1,67 @@
 {
   "compilerOptions": {
+    // === Cache i optymalizacja ===
+    // Osobny cache dla konfiguracji Node.js - niezależny od aplikacji frontendowej
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+
+    // === Docelowa wersja JavaScript ===
+    // ES2023 - najnowsza wersja, używana w Node.js 18+
     "target": "ES2023",
+
+    // Tylko typy dla ES2023 - NIE MA typów DOM, bo to środowisko Node.js
+    // Brak dostępu do window, document, etc. - zapobiega błędom w config files
     "lib": ["ES2023"],
+
+    // System modułów ESNext - import/export (Node.js wspiera to od wersji 14+)
     "module": "ESNext",
-    "types": [],
+
+    // Typy dla Node.js (process, Buffer, __dirname, require, etc.)
+    // Potrzebne w plikach konfiguracyjnych Vite i Vitest
+    "types": ["node"],
+
+    // Pomija sprawdzanie typów w node_modules - przyspiesza kompilację
     "skipLibCheck": true,
 
-    /* Bundler mode */
+    /* === Tryb Bundlera (Vite) === */
+    // Rozwiązywanie modułów w trybie bundlera - dopasowane do Vite
     "moduleResolution": "bundler",
+
+    // Pozwala importować pliki .ts bezpośrednio - Vite/Vitest je przetworzy
     "allowImportingTsExtensions": true,
+
+    // Wymusza dokładną składnię import/export
     "verbatimModuleSyntax": true,
+
+    // Wszystkie pliki traktowane jako moduły ES
     "moduleDetection": "force",
+
+    // Nie generuje plików .js - te pliki są tylko sprawdzane pod kątem typów
+    // Vite i Vitest bezpośrednio wykonują pliki .ts
     "noEmit": true,
 
-    /* Linting */
+    /* === Linting - Ścisłe sprawdzanie === */
+    // Pełne ścisłe sprawdzanie - te same zasady co w kodzie aplikacji
     "strict": true,
+
+    // Błąd przy nieużywanych zmiennych lokalnych
     "noUnusedLocals": true,
+
+    // Błąd przy nieużywanych parametrach funkcji
     "noUnusedParameters": true,
+
+    // Tylko składnia TypeScript, która może być bezpiecznie usunięta
     "erasableSyntaxOnly": true,
+
+    // Wymaga break/return w każdym case w switch
     "noFallthroughCasesInSwitch": true,
+
+    // Sprawdza efekty uboczne przy importach
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite.config.ts"]
+
+  // === Pliki konfiguracyjne narzędzi ===
+  // Ten tsconfig dotyczy TYLKO plików konfiguracyjnych, nie kodu aplikacji
+  // - vite.config.ts: konfiguracja buildera (port, proxy, plugins)
+  // - vitest.config.ts: konfiguracja testów jednostkowych
+  "include": ["vite.config.ts", "vitest.config.ts"]
 }

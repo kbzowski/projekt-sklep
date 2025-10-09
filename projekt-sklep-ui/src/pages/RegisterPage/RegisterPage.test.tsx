@@ -12,19 +12,14 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { renderWithProviders } from '../../test/utils'
-
 import RegisterPage from './RegisterPage'
-
-
+import { useRegisterPage } from './useRegisterPage'
+import { renderWithProviders } from '../../test/utils'
 
 // Mock dla hooka useRegisterPage
 vi.mock('./useRegisterPage', () => ({
   useRegisterPage: vi.fn(),
 }))
-
-// Import zmockowanego hooka
-import { useRegisterPage } from './useRegisterPage'
 
 describe('RegisterPage Component', () => {
   /**

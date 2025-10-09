@@ -63,12 +63,6 @@ function ConfigLoader({ children }: { children: ReactNode }) {
  * 1. Łapie "zawieszone" komponenty (gdy use() czeka na Promise)
  * 2. Pokazuje fallback podczas ładowania
  * 3. Automatycznie pokazuje children gdy Promise resolve
- *
- * Zalety vs if(isLoading):
- * - Deklaratywny zamiast imperatywnego
- * - Lepsze UX - może pokazywać różne loadery dla różnych części UI
- * - Współpracuje z Concurrent Features (React 18+)
- * - Mniej boilerplate kodu
  */
 export function ConfigProvider({ children }: ConfigProviderProps) {
   return (
@@ -91,4 +85,3 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
     </Suspense>
   )
 }
-// ===================================================================

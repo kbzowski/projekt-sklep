@@ -1,4 +1,4 @@
-import styles from '../../pages/ProductsPage/ProductsPage.module.css'
+import styles from './ProductCard.module.css'
 import type { Product } from '../../types'
 import Button from '../Button'
 

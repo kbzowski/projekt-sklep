@@ -5,7 +5,6 @@ import { ROUTE_METADATA } from '../../lib/routes'
 import ErrorBoundary from '../ErrorBoundary'
 import Footer from '../Footer'
 import Header from '../Header'
-
 import styles from './Layout.module.css'
 
 /**
@@ -22,7 +21,7 @@ export default function Layout() {
       document.title = `${metadata.title} - E-Zaliczenie`
     }
     else {
-      document.title = 'E-Sklep'
+      document.title = 'E-Zaliczenie'
     }
   }, [location.pathname])
 

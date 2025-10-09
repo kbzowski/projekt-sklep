@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
 
+import styles from './CartPage.module.css'
+import { useCartPage } from './useCartPage'
 import Button from '../../components/Button'
 import CartItem from '../../components/CartItem'
 
-import styles from './CartPage.module.css'
-import { useCartPage } from './useCartPage'
 
 export default function CartPage() {
   const {

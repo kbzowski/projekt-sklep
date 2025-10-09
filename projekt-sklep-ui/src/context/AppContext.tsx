@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useCallback, useContext, useState } from 'react'
+import { createContext, type ReactNode, useContext, useState } from 'react'
 
 import type { CartItem } from '../services'
 import type {AppContextType, AppState, Category, Product, ProductOrderBy, User} from '../types'
@@ -49,34 +49,35 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // === PODSTAWOWE SETTERY STANU ===
 
   /**
-   * useCallback zapobiega niepotrzebnym re-renderom komponentów
-   * które otrzymują te funkcje jako propsy
+   * Bez React Compiler: użyj useCallback z pustą tablicą zależności []
+   * aby zapobiec niepotrzebnym re-renderom komponentów otrzymujących te funkcje jako propsy
    *
-   * Pusta tablica zależności [] → funkcja tworzona raz, nigdy nie zmienia referencji
+   * React Compiler automatycznie memoizuje funkcje gdzie potrzeba,
+   * dlatego useCallback nie jest już konieczny
    */
-  const setUser = useCallback((user: User | null) => {
+  const setUser = (user: User | null) => {
     setState(prev => ({ ...prev, user }))
-  }, [])
+  }
 
-  const setCart = useCallback((cart: CartItem[]) => {
+  const setCart = (cart: CartItem[]) => {
     setState(prev => ({ ...prev, cart }))
-  }, [])
+  }
 
-  const setProducts = useCallback((products: Product[]) => {
+  const setProducts = (products: Product[]) => {
     setState(prev => ({ ...prev, products }))
-  }, [])
+  }
 
-  const setCategories = useCallback((categories: Category[]) => {
+  const setCategories = (categories: Category[]) => {
     setState(prev => ({ ...prev, categories }))
-  }, [])
+  }
 
-  const setLoading = useCallback((isLoading: boolean) => {
+  const setLoading = (isLoading: boolean) => {
     setState(prev => ({ ...prev, isLoading }))
-  }, [])
+  }
 
-  const setError = useCallback((error: string | null) => {
+  const setError = (error: string | null) => {
     setState(prev => ({ ...prev, error }))
-  }, [])
+  }
 
   // === FILTRY I PAGINACJA ===
 
@@ -84,34 +85,44 @@ export function AppProvider({ children }: { children: ReactNode }) {
    * Zmiana kategorii automatycznie resetuje paginację do strony 1
    * Zapobiega sytuacji, gdzie użytkownik jest na stronie 3 kategorii A,
    * przełącza się na kategorię B (która ma tylko 1 stronę) → błąd 404
+   *
+   * Bez React Compiler: użyj useCallback z pustą tablicą zależności []
    */
-  const setCategoryFilter = useCallback((category: string | null) => {
+  const setCategoryFilter = (category: string | null) => {
     setState(prev => ({
       ...prev,
       currentCategory: category,
       currentPage: 1, // Reset strony przy zmianie kategorii
     }))
-  }, [])
+  }
 
   /**
    * Zmiana sortowania również resetuje paginację
    * Analogiczne powody jak przy setCategoryFilter
+   *
+   * Bez React Compiler: użyj useCallback z pustą tablicą zależności []
    */
-  const setSortBy = useCallback((sortBy: ProductOrderBy) => {
+  const setSortBy = (sortBy: ProductOrderBy) => {
     setState(prev => ({
       ...prev,
       sortBy,
       currentPage: 1, // Reset strony przy zmianie sortowania
     }))
-  }, [])
+  }
 
-  const setPage = useCallback((page: number) => {
+  /**
+   * Bez React Compiler: użyj useCallback z pustą tablicą zależności []
+   */
+  const setPage = (page: number) => {
     setState(prev => ({ ...prev, currentPage: page }))
-  }, [])
+  }
 
-  const setPagination = useCallback((totalPages: number, totalProducts: number) => {
+  /**
+   * Bez React Compiler: użyj useCallback z pustą tablicą zależności []
+   */
+  const setPagination = (totalPages: number, totalProducts: number) => {
     setState(prev => ({ ...prev, totalPages, totalProducts }))
-  }, [])
+  }
 
   /**
    * Wartość kontekstu - wyłącznie stan i settery

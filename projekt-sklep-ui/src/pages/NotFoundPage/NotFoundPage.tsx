@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 
+import styles from './NotFoundPage.module.css'
 import { ROUTES } from '../../lib/routes'
 
-import styles from './NotFoundPage.module.css'
 
 export default function NotFoundPage() {
   return (

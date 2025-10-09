@@ -2,7 +2,6 @@ import { useEffect, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { apiClient } from '../services'
-
 import { useApp } from './AppContext'
 
 /**
@@ -54,7 +53,7 @@ export function AppAuthHandler({ children }: { children: ReactNode }) {
 
     /**
      * Cleanup function - wykonywana przy unmount komponentu
-     * Usuwa handler aby uniknąć memory leaks
+     * Usuwa handler
      */
     return () => {
       apiClient.setAuthErrorHandler(() => {})
