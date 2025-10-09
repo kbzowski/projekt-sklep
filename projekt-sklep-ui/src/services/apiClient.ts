@@ -267,9 +267,9 @@ export class ApiClient {
    *
    * MECHANIZM:
    * ----------
-   * 1. Jeśli refreshPromise już istnieje → Czekaj na niego (ktoś inny już refreshuje)
+   * 1. Jeśli refreshPromise już istnieje → Zwróć go (wiele requestów czeka na ten sam Promise)
    * 2. Jeśli nie istnieje → Utwórz nowy refreshPromise i wykonaj refresh
-   * 3. Po zakończeniu → Wyczyść refreshPromise (null)
+   * 3. Po zakończeniu → Automatycznie wyczyść refreshPromise w finally()
    *
    * DLACZEGO PROMISE A NIE BOOLEAN?
    * --------------------------------
@@ -288,19 +288,60 @@ export class ApiClient {
    * if (!refreshPromise) {
    *   refreshPromise = refresh()
    * }
-   * await refreshPromise  // Wszystkie requesty czekają na ten sam Promise
+   * return refreshPromise  // Wszystkie requesty czekają na ten sam Promise
    * ```
+   *
+   * DLACZEGO FINALLY() A NIE RĘCZNE CZYSZCZENIE?
+   * ---------------------------------------------
+   * finally() wykona się ZAWSZE - niezależnie od sukcesu czy błędu:
+   *
+   * ```typescript
+   * // Źle (ręczne czyszczenie):
+   * if (!this.refreshPromise) {
+   *   this.refreshPromise = this.refreshToken()
+   * }
+   * await this.refreshPromise
+   * this.refreshPromise = null  // Jeśli await rzuci błąd - NIGDY się nie wykona!
+   *
+   * // Dobrze (finally):
+   * if (!this.refreshPromise) {
+   *   this.refreshPromise = this.refreshToken().finally(() => {
+   *     this.refreshPromise = null  // ✓ Wykona się ZAWSZE (sukces LUB błąd)
+   *   })
+   * }
+   * return this.refreshPromise  // ✓ Promise "sam się czyści" po zakończeniu
+   * ```
+   *
+   * PRZYKŁAD DZIAŁANIA:
+   * -------------------
+   * Scenariusz: 3 równoległe requesty dostają 401 jednocześnie
+   *
+   * Request 1: refreshPromise === null
+   *            → Tworzy: this.refreshToken().finally(() => this.refreshPromise = null)
+   *            → Zwraca ten Promise
+   *
+   * Request 2: refreshPromise !== null (Request 1 utworzył)
+   *            → Zwraca ten sam Promise (czeka na ten sam refresh)
+   *
+   * Request 3: refreshPromise !== null (Request 1 utworzył)
+   *            → Zwraca ten sam Promise (czeka na ten sam refresh)
+   *
+   * Po zakończeniu: finally() automatycznie czyści refreshPromise → następny refresh może wystartować
    */
-  private async performRefresh(): Promise<void> {
-    // Jeśli refresh już trwa - czekaj na ten sam Promise
+  private performRefresh(): Promise<void> {
+    // Jeśli refresh już trwa - zwróć istniejący Promise (współdzielony wynik)
     if (!this.refreshPromise) {
-      this.refreshPromise = this.refreshToken()
+      // Utwórz nowy Promise z automatycznym czyszczeniem po zakończeniu
+      this.refreshPromise = this.refreshToken().finally(() => {
+        // finally() wykona się ZAWSZE - zarówno przy sukcesie jak i błędzie
+        // Dzięki temu następny refresh może się uruchomić (refreshPromise = null)
+        this.refreshPromise = null
+      })
     }
 
-    await this.refreshPromise
-
-    // Wyczyść Promise po zakończeniu (gotowy na kolejny refresh)
-    this.refreshPromise = null
+    // Zwróć Promise - wszystkie wywołania czekają na ten sam wynik
+    // Nie potrzeba async/await - zwracamy Promise bezpośrednio
+    return this.refreshPromise
   }
 
   /**
