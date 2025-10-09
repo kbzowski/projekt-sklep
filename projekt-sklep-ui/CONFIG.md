@@ -17,11 +17,6 @@ Po zbudowaniu aplikacji (`npm run build`) możesz:
 echo '{"apiUrl": "https://my-api.com/api"}' > dist/config.json
 ```
 
-```bash
-# Lub skopiować gotowy config
-cp config.production.json dist/config.json
-```
-
 ## 📝 Format config.json
 
 ```json
@@ -45,5 +40,3 @@ cp config.production.json dist/config.json
   "apiUrl": "https://api.myapp.com/api"
 }
 ```
-
-To wszystko! Prosto i skutecznie 🎯
