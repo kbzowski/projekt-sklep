@@ -1,29 +1,41 @@
-import { BrowserRouter as Router } from 'react-router-dom'
+import {BrowserRouter as Router} from 'react-router-dom'
 
 import AppRouter from './components/AppRouter'
-import { ConfigProvider } from './components/ConfigProvider'
-import { AppAuthHandler } from './context/AppAuthHandler'
-import { AppProvider } from './context/AppContext'
+import {ConfigProvider} from './components/ConfigProvider'
+import ErrorBoundary from './components/ErrorBoundary'
+import {AppAuthHandler} from './context/AppAuthHandler'
+import {AppProvider} from './context/AppContext'
 
 /**
- * Main App component with provider setup and routing
+ * Główny komponent aplikacji
  *
- * Key patterns demonstrated:
- * - Context provider composition for global state
- * - Router configuration with BrowserRouter
- * - Separation of concerns with dedicated AppRouter component
+ * Hierarchia komponentów:
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * ErrorBoundary
+ *   - Łapie błędy z całej aplikacji
+ *   - Może być umieszczony WSZĘDZIE w hierarchii
+ *
+ * ConfigProvider (Suspense + use())
+ *   - Ładuje konfigurację API z use(configPromise)
+ *
+ * Router (React Router Context)
+ *   - Dostarcza routing context dla <Link>, useNavigate...
+ *   - Musi być PONIŻEJ ConfigProvider (potrzebuje config)
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  */
 function App() {
   return (
-    <ConfigProvider>
-      <AppProvider>
-        <Router>
-          <AppAuthHandler>
-            <AppRouter />
-          </AppAuthHandler>
-        </Router>
-      </AppProvider>
-    </ConfigProvider>
+    <ErrorBoundary>
+      <ConfigProvider>
+        <AppProvider>
+          <Router>
+            <AppAuthHandler>
+              <AppRouter />
+            </AppAuthHandler>
+          </Router>
+        </AppProvider>
+      </ConfigProvider>
+    </ErrorBoundary>
   )
 }
 
