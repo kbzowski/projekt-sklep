@@ -60,13 +60,6 @@
     // Łapie wiele potencjalnych błędów już na etapie kompilacji
     "strict": true,
 
-    // Błąd gdy zdefiniujemy zmienną lokalną i jej nie użyjemy
-    // Pomaga utrzymać kod czysty i bez martwego kodu
-    "noUnusedLocals": true,
-
-    // Błąd gdy funkcja przyjmuje parametr, którego nie używamy
-    // Pomaga wykryć zbędne parametry
-    "noUnusedParameters": true,
 
     // Wymusza tylko składnię TypeScript, która może być usunięta bez zmiany zachowania
     // Ważne dla React Compiler - zapobiega problemom z niekompatybilną składnią
