@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useTransition } from 'react'
 
 import { useApp } from '../../context/AppContext'
 import { useCart } from '../../hooks/useCart'
@@ -7,22 +7,6 @@ import type { ProductOrderBy } from '../../types'
 
 /**
  * useProductsPage - custom hook orkiestrujący logikę strony produktów
- *
- * Architektura "Page Hook":
- * - Hook izoluje logikę biznesową od komponentu UI
- * - Komponent otrzymuje gotowe dane i funkcje handlery
- * - Łatwiejsze testowanie - hook można testować oddzielnie od UI
- * - Separation of concerns: hook = logika, komponent = prezentacja
- *
- * Odpowiedzialności:
- * 1. Ładowanie kategorii (raz przy mount)
- * 2. Ładowanie produktów z filtrami i paginacją (re-fetch przy zmianie filtrów)
- * 3. Dodawanie produktów do koszyka
- * 4. Obsługa zmian filtrów (kategoria, sortowanie, strona)
- * 5. Error handling i loading states
- *
- * Data flow:
- * Services (API) → Page Hook (logika) → Context (stan) → Component (UI)
  */
 export const useProductsPage = () => {
   const {
@@ -51,7 +35,12 @@ export const useProductsPage = () => {
   const { addToCart } = useCart()
 
   /**
-   * Effect 1: Ładowanie kategorii przy mount komponentu
+   * useTransition - React 19 hook dla nie blokujących zmian stanu
+   */
+  const [isPending, startTransition] = useTransition()
+
+  /**
+   * Ładowanie kategorii przy mount komponentu
    *
    * Optymalizacja: sprawdza czy już załadowane (categories.length > 0)
    * Dzięki temu nie ładujemy ponownie przy każdym wejściu na /products
@@ -77,15 +66,15 @@ export const useProductsPage = () => {
   }, [categories.length, setCategories])
 
   /**
-   * Effect 2: Ładowanie produktów z filtrami i paginacją
+   * Ładowanie produktów z filtrami i paginacją
    *
-   * Re-fetch triggers (zależności useEffect):
+   * Zależności useEffect:
    * - currentCategory - zmiana kategorii filtrującej
    * - sortBy - zmiana sortowania (name, price, newest)
    * - currentPage - zmiana strony paginacji
    * - itemsPerPage - zmiana liczby produktów na stronę
    *
-   * Każda zmiana tych wartości → nowy fetch produktów z backendu
+   * Każda zmiana tych wartości - nowy fetch produktów z backendu
    *
    * Loading states:
    * - setLoading(true) przed fetch
@@ -122,38 +111,31 @@ export const useProductsPage = () => {
 
   /**
    * Handler: Zmiana kategorii filtrującej
-   * setCategoryFilter automatycznie resetuje currentPage do 1 (patrz AppContext)
    */
   const handleCategoryChange = (category: string | null) => {
-    setCategoryFilter(category)
+    startTransition(() => {
+      setCategoryFilter(category)
+    })
   }
 
   /**
    * Handler: Zmiana sortowania
-   * setSortBy automatycznie resetuje currentPage do 1 (patrz AppContext)
    */
   const handleSortChange = (sort: ProductOrderBy) => {
-    setSortBy(sort)
+    startTransition(() => {
+      setSortBy(sort)
+    })
   }
 
   /**
    * Handler: Zmiana strony paginacji
    */
   const handlePageChange = (page: number) => {
-    setPage(page)
+    startTransition(() => {
+      setPage(page)
+    })
   }
 
-  /**
-   * Return: API hooka - dane i funkcje dla komponentu UI
-   *
-   * Komponent ProductsPage.tsx otrzymuje:
-   * - State (produkty, kategorie, filtry, loading, etc.)
-   * - Actions (handlery do obsługi interakcji użytkownika)
-   *
-   * Dzięki temu komponent jest "głupi" - tylko renderuje UI i wywołuje handlery
-   *
-   * handleAddToCart pochodzi z useCart() - reużywalny hook dla operacji koszyka
-   */
   return {
     // State
     products,
@@ -163,6 +145,7 @@ export const useProductsPage = () => {
     currentPage,
     totalPages,
     isLoading,
+    isPending, // ← React 19 useTransition state
     // Actions
     handleAddToCart: addToCart,
     handleCategoryChange,

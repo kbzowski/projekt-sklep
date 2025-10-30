@@ -4,10 +4,19 @@ import Button from '../Button'
 interface PaginationProps {
   currentPage: number
   totalPages: number
+  disabled?: boolean
   onPageChange: (page: number) => void
 }
 
-export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+/**
+ * Komponent paginacji
+ */
+export default function Pagination({
+  currentPage,
+  totalPages,
+  disabled = false,
+  onPageChange,
+}: PaginationProps) {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
 
   return (
@@ -15,7 +24,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       <Button
         variant="secondary"
         onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
+        disabled={disabled || currentPage === 1}
       >
         Poprzednia
       </Button>
@@ -25,6 +34,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
           key={page}
           variant={page === currentPage ? 'primary' : 'secondary'}
           onClick={() => onPageChange(page)}
+          disabled={disabled}
         >
           {page}
         </Button>
@@ -33,7 +43,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       <Button
         variant="secondary"
         onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
+        disabled={disabled || currentPage === totalPages}
       >
         Następna
       </Button>

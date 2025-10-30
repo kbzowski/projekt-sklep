@@ -19,6 +19,12 @@
   flex-direction: column;
   gap: 1rem;
   margin-bottom: 1.5rem;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.filtersPending {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 .select {
@@ -37,6 +43,13 @@
   grid-template-columns: 1fr;
   gap: 1.5rem;
   margin-bottom: 2rem;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.gridPending {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: wait;
 }
 
 .noProducts {

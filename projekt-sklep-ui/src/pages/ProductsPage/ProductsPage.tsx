@@ -4,7 +4,9 @@ import Pagination from '../../components/Pagination'
 import ProductCard from '../../components/ProductCard'
 import ProductFilters from '../../components/ProductFilters'
 
-
+/**
+ * Strona listy produktów z filtrami i paginacją
+ */
 export default function ProductsPage() {
   const {
     products,
@@ -14,13 +16,15 @@ export default function ProductsPage() {
     currentPage,
     totalPages,
     isLoading,
+    isPending,
     handleAddToCart,
     handleCategoryChange,
     handleSortChange,
     handlePageChange,
   } = useProductsPage()
 
-  if (isLoading) {
+  // Inicjalizacja - pokazuj informacje o ładowaniu
+  if (isLoading && products.length === 0) {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
@@ -43,6 +47,7 @@ export default function ProductsPage() {
           sortBy={sortBy}
           onCategoryChange={handleCategoryChange}
           onSortChange={handleSortChange}
+          isPending={isPending}
         />
       </div>
 
@@ -54,14 +59,19 @@ export default function ProductsPage() {
         )
         : (
           <>
-            <div className={styles.grid}>
+            <div className={`${styles.grid} ${isPending ? styles.gridPending : ''}`}>
               {products.map(product => (
                 <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
               ))}
             </div>
 
             {totalPages > 1 && (
-              <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                disabled={isPending}
+              />
             )}
           </>
         )}
