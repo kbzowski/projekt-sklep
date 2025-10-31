@@ -3,9 +3,14 @@ import { useProductsPage } from './useProductsPage'
 import Pagination from '../../components/Pagination'
 import ProductCard from '../../components/ProductCard'
 import ProductFilters from '../../components/ProductFilters'
+import SearchBar from '../../components/SearchBar/SearchBar'
 
 /**
  * Strona listy produktów z filtrami i paginacją
+ *
+ * React 19 features:
+ * - useTransition dla smooth filter updates (isPending)
+ * - useDeferredValue dla płynnego wyszukiwania (isSearchPending)
  */
 export default function ProductsPage() {
   const {
@@ -13,13 +18,16 @@ export default function ProductsPage() {
     categories,
     currentCategory,
     sortBy,
+    searchQuery,
     currentPage,
     totalPages,
     isLoading,
     isPending,
+    isSearchPending,
     handleAddToCart,
     handleCategoryChange,
     handleSortChange,
+    handleSearchChange,
     handlePageChange,
   } = useProductsPage()
 
@@ -41,6 +49,11 @@ export default function ProductsPage() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.title}>Produkty</h1>
+        <SearchBar
+          value={searchQuery}
+          onChange={handleSearchChange}
+          isPending={isSearchPending}
+        />
         <ProductFilters
           categories={categories}
           currentCategory={currentCategory}

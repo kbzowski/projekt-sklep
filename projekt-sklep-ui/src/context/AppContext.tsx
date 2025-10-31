@@ -14,6 +14,7 @@ const initialState: AppState = {
   categories: [],
   currentCategory: null,
   sortBy: 'name',
+  searchQuery: '',
   currentPage: 1,
   itemsPerPage: 6,
   totalPages: 1,
@@ -111,6 +112,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   /**
+   * Zmiana search query resetuje paginację
+   * User wpisuje nowe zapytanie - powinien zobaczyć pierwszą stronę wyników
+   *
+   * Bez React Compiler: użyj useCallback z pustą tablicą zależności []
+   */
+  const setSearchQuery = (searchQuery: string) => {
+    setState(prev => ({
+      ...prev,
+      searchQuery,
+      currentPage: 1, // Reset strony przy zmianie search query
+    }))
+  }
+
+  /**
    * Bez React Compiler: użyj useCallback z pustą tablicą zależności []
    */
   const setPage = (page: number) => {
@@ -138,6 +153,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setError,
     setCategoryFilter,
     setSortBy,
+    setSearchQuery,
     setPage,
     setPagination,
   }

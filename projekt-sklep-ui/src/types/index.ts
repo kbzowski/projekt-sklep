@@ -34,6 +34,7 @@ export interface AppState {
   categories: Category[]
   currentCategory: string | null
   sortBy: ProductOrderBy
+  searchQuery: string
   currentPage: number
   itemsPerPage: number
   totalPages: number
@@ -54,6 +55,7 @@ export interface AppContextType {
   // Filtry i paginacja
   setCategoryFilter: (category: string | null) => void
   setSortBy: (sortBy: ProductOrderBy) => void
+  setSearchQuery: (query: string) => void
   setPage: (page: number) => void
   setPagination: (totalPages: number, totalProducts: number) => void
 }

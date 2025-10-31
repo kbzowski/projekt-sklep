@@ -11,6 +11,10 @@ export class ProductFilterDto {
   sortBy?: 'name' | 'price-asc' | 'price-desc' = 'name';
 
   @IsOptional()
+  @IsString()
+  search?: string;
+
+  @IsOptional()
   @Transform(({ value }) => parseInt(value))
   page?: number = 1;
 

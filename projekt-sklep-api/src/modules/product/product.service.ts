@@ -10,7 +10,7 @@ export class ProductService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(filter: ProductFilterDto) {
-    const { category, sortBy, page, limit } = filter;
+    const { category, sortBy, search, page, limit } = filter;
     const skip = ((page || 1) - 1) * (limit || 6);
 
     // Warunki filtrowania
@@ -19,6 +19,25 @@ export class ProductService {
       where.category = {
         slug: category,
       };
+    }
+
+    // Wyszukiwanie po nazwie lub opisie
+    // SQLite: case-insensitive dla ASCII domyślnie
+    // Dla Unicode (polskie znaki): konwersja do lowercase po obu stronach
+    if (search && search.trim()) {
+      const searchLower = search.toLowerCase();
+      where.OR = [
+        {
+          name: {
+            contains: searchLower,
+          },
+        },
+        {
+          description: {
+            contains: searchLower,
+          },
+        },
+      ];
     }
 
     // Sortowanie

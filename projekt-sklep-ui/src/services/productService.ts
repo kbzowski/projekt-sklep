@@ -11,6 +11,7 @@ export interface ProductsResponse {
 export interface ProductsParams {
   category?: string
   sortBy?: ProductOrderBy
+  search?: string
   page?: number
   limit?: number
 }
@@ -21,6 +22,7 @@ export const productService = {
 
     if (params.category) searchParams.set('category', params.category)
     if (params.sortBy) searchParams.set('sortBy', params.sortBy)
+    if (params.search) searchParams.set('search', params.search)
     if (params.page) searchParams.set('page', params.page.toString())
     if (params.limit) searchParams.set('limit', params.limit.toString())
 

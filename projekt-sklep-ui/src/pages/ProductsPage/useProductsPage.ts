@@ -1,4 +1,4 @@
-import { useEffect, useTransition } from 'react'
+import { useEffect, useTransition, useDeferredValue } from 'react'
 
 import { useApp } from '../../context/AppContext'
 import { useCart } from '../../hooks/useCart'
@@ -17,6 +17,7 @@ export const useProductsPage = () => {
     setError,
     setCategoryFilter,
     setSortBy,
+    setSearchQuery,
     setPage,
     setPagination,
   } = useApp()
@@ -26,6 +27,7 @@ export const useProductsPage = () => {
     categories,
     currentCategory,
     sortBy,
+    searchQuery,
     currentPage,
     itemsPerPage,
     totalPages,
@@ -38,6 +40,20 @@ export const useProductsPage = () => {
    * useTransition - React 19 hook dla nie blokujących zmian stanu
    */
   const [isPending, startTransition] = useTransition()
+
+  /**
+   * useDeferredValue - React 19 hook dla opóźnionych wartości
+   *
+   * Benefit:
+   * - User wpisuje w SearchBar → instant update input value (searchQuery)
+   * - deferredSearchQuery aktualizuje się z opóźnieniem (nie blokuje UI)
+   * - Filtrowanie produktów używa deferredSearchQuery → płynne UX
+   *
+   * isPending dla search:
+   * - searchQuery !== deferredSearchQuery → user jeszcze wpisuje
+   * - pokazujemy spinner w SearchBar
+   */
+  const deferredSearchQuery = useDeferredValue(searchQuery)
 
   /**
    * Ładowanie kategorii przy mount komponentu
@@ -71,10 +87,14 @@ export const useProductsPage = () => {
    * Zależności useEffect:
    * - currentCategory - zmiana kategorii filtrującej
    * - sortBy - zmiana sortowania (name, price, newest)
+   * - deferredSearchQuery - wyszukiwanie (backend search)
    * - currentPage - zmiana strony paginacji
    * - itemsPerPage - zmiana liczby produktów na stronę
    *
-   * Każda zmiana tych wartości - nowy fetch produktów z backendu
+   * WAŻNE: Używamy deferredSearchQuery (nie searchQuery)
+   * - User wpisuje → searchQuery aktualizuje się natychmiast (input)
+   * - deferredSearchQuery aktualizuje się z opóźnieniem (nie blokuje UI)
+   * - Fetch używa deferredSearchQuery → backend search z debounce efektem
    *
    * Loading states:
    * - setLoading(true) przed fetch
@@ -90,6 +110,7 @@ export const useProductsPage = () => {
         const response = await productService.getProducts({
           category: currentCategory || undefined,
           sortBy,
+          search: deferredSearchQuery || undefined,
           page: currentPage,
           limit: itemsPerPage,
         })
@@ -107,7 +128,7 @@ export const useProductsPage = () => {
     }
 
     loadProducts()
-  }, [currentCategory, sortBy, currentPage, itemsPerPage, setProducts, setPagination, setLoading, setError])
+  }, [currentCategory, sortBy, deferredSearchQuery, currentPage, itemsPerPage, setProducts, setPagination, setLoading, setError])
 
   /**
    * Handler: Zmiana kategorii filtrującej
@@ -136,20 +157,47 @@ export const useProductsPage = () => {
     })
   }
 
+  /**
+   * Handler: Zmiana search query
+   */
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query)
+  }
+
+  /**
+   * isPending dla search - czy user jeszcze wpisuje?
+   * searchQuery !== deferredSearchQuery → pokazujemy spinner w SearchBar
+   *
+   * Backend search flow:
+   * 1. User wpisuje → searchQuery update natychmiast (input responsive)
+   * 2. deferredSearchQuery update z opóźnieniem (debounce effect)
+   * 3. useEffect z deferredSearchQuery → fetch z backendu
+   * 4. Podczas wpisywania: isSearchPending = true → spinner w SearchBar
+   *
+   * Benefit:
+   * - Płynny input (instant feedback)
+   * - Mniej requestów do backendu (debounce via useDeferredValue)
+   * - Backend search (database indexing, case-insensitive, itp.)
+   */
+  const isSearchPending = searchQuery !== deferredSearchQuery
+
   return {
     // State
-    products,
+    products, // ← Produkty z backendu (już przefiltrowane)
     categories,
     currentCategory,
     sortBy,
+    searchQuery,
     currentPage,
     totalPages,
     isLoading,
-    isPending, // ← React 19 useTransition state
+    isPending, // ← React 19 useTransition state (filters)
+    isSearchPending, // ← React 19 useDeferredValue state (search)
     // Actions
     handleAddToCart: addToCart,
     handleCategoryChange,
     handleSortChange,
+    handleSearchChange,
     handlePageChange,
   }
 }
