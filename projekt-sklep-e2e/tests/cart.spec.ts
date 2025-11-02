@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { ROUTES } from '../helpers/test-data';
-import { loginAsTestUser } from '../helpers/auth-helpers';
+import { loginAsTestUser, clearCart } from '../helpers/auth-helpers';
 
 /**
  * Testy koszyka - Krok po kroku
@@ -17,9 +17,14 @@ test.describe('Cart - bez uwierzytelnienia', () => {
 });
 
 test.describe('Cart - z uwierzytelnieniem', () => {
-  // Zaloguj przed każdym testem
+  // Uruchom testy sekwencyjnie (serial) żeby uniknąć race conditions
+  // Wszystkie testy używają tego samego użytkownika testowego i koszyka
+  test.describe.configure({ mode: 'serial' });
+
+  // Zaloguj i wyczyść koszyk przed każdym testem (izolacja testów)
   test.beforeEach(async ({ page }) => {
     await loginAsTestUser(page);
+    await clearCart(page); // Czyść PRZED testem żeby zapewnić czysty stan początkowy
   });
 
   test('should show empty cart initially', async ({ page }) => {

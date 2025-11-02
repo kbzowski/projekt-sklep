@@ -17,9 +17,6 @@ export default defineConfig({
   // Katalog z testami
   testDir: './tests',
 
-  // Global setup - resetuje test database przed testami
-  globalSetup: require.resolve('./globalSetup'),
-
   // Maksymalny czas wykonania pojedynczego testu
   timeout: 30 * 1000,
 
@@ -84,8 +81,8 @@ export default defineConfig({
   webServer: [
     {
       // Serwer API (NestJS) - tryb testowy z test.db
-      command: 'cd ../projekt-sklep-api && npm run start:test',
-      url: 'http://localhost:9000/api/products',
+      command: 'cd ../projekt-sklep-api && npm run db:reset:test && npm run start:test',
+      url: 'http://localhost:9000/api',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
       stdout: 'pipe',

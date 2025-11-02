@@ -1,20 +1,27 @@
 import { useEffect, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { apiClient } from '../services'
+import { apiClient, authService, cartService } from '../services'
 import { useApp } from './AppContext'
 
 /**
- * AppAuthHandler - globalny handler wygasłych tokenów
+ * Sprawdza czy cookie o danej nazwie istnieje (tylko dla cookies BEZ httpOnly)
+ *
+ * @param name - Nazwa cookie
+ * @returns true jeśli cookie istnieje, false w przeciwnym razie
+ */
+function hasCookie(name: string): boolean {
+  return document.cookie.split(';').some((item) => item.trim().startsWith(`${name}=`))
+}
+
+/**
+ * AppAuthHandler - globalny handler autentykacji i rehydracji sesji
  *
  * Odpowiedzialności:
- * 1. Rejestruje callback w ApiClient dla błędów 401 (Unauthorized)
- * 2. Gdy refresh token wygaśnie → czyści stan aplikacji i przekierowuje na /login
+ * 1. **Rehydracja sesji przy starcie** - Sprawdza cookie 'is-logged' i przywraca stan
+ * 2. Rejestruje callback w ApiClient dla błędów 401 (Unauthorized)
+ * 3. Gdy refresh token wygaśnie - czyści stan aplikacji i przekierowuje na /login
  *
- * Dlaczego osobny komponent?
- * - Wymaga dostępu do useNavigate() (hook z react-router)
- * - useNavigate() działa tylko wewnątrz <Router>
- * - AppContext jest poza <Router> w hierarchii providerów
  *
  * Hierarchia:
  * <AppProvider>              ← AppContext (brak dostępu do Router)
@@ -50,6 +57,34 @@ export function AppAuthHandler({ children }: { children: ReactNode }) {
       setCart([])
       navigate('/login')
     })
+
+    // REHYDRACJA SESJI przy starcie aplikacji
+    async function rehydrateSession() {
+      // Sprawdź czy użytkownik ma aktywną sesję (cookie 'is-logged')
+      if (hasCookie('is-logged')) {
+        try {
+          // Pobierz dane użytkownika z API
+          const user = await authService.getCurrentUser()
+          setUser(user)
+
+          // Pobierz koszyk użytkownika
+          try {
+            const cart = await cartService.getCart()
+            setCart(cart)
+          } catch {
+            // Koszyk może być pusty - nie jest błędem
+            setCart([])
+          }
+        } catch {
+          // 401 lub inny błąd → sesja wygasła lub tokeny nieprawidłowe
+          // authErrorHandler automatycznie wyczyści stan i przekieruje
+          // Nic nie robimy tutaj
+        }
+      }
+    }
+
+    // Wykonaj rehydrację przy montowaniu komponentu
+    void rehydrateSession()
 
     /**
      * Cleanup function - wykonywana przy unmount komponentu

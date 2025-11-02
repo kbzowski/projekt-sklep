@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -7,6 +7,7 @@ import { UpdateCartDto } from './dto/update-cart.dto';
 
 @Injectable()
 export class CartService {
+  private readonly logger = new Logger(CartService.name);
   constructor(private readonly prisma: PrismaService) {}
 
   async getCart(userId: number) {
@@ -48,40 +49,29 @@ export class CartService {
       throw new Error('Product not found');
     }
 
-    // Sprawdź czy item już jest w koszyku
-    const existingItem = await this.prisma.cartItem.findUnique({
+    return this.prisma.cartItem.upsert({
       where: {
+        // 1. Warunek Wyszukiwania: Używamy unikalnego pola złożonego
         userId_productId: {
           userId,
           productId,
         },
       },
+      update: {
+        // 2. Jeśli rekord ZNALEZIONO: Zwiększamy ilość o podaną `quantity`.
+        // Użycie increment jest kluczowe w tym miejscu, ponieważ działa atomowo w bazie danych.
+        // https://www.prisma.io/docs/orm/prisma-client/queries/crud#update-a-number-field
+        quantity: {
+          increment: quantity,
+        },
+      },
+      create: {
+        // 3. Jeśli rekordu NIE ZNALEZIONO: Tworzymy nowy rekord.
+        userId,
+        productId,
+        quantity,
+      },
     });
-
-    if (existingItem) {
-      // Zwiększ ilość
-      return this.prisma.cartItem.update({
-        where: {
-          userId_productId: {
-            userId,
-            productId,
-          },
-        },
-        data: {
-          quantity: existingItem.quantity + quantity,
-        },
-      });
-    }
-    else {
-      // Dodaj nowy item
-      return this.prisma.cartItem.create({
-        data: {
-          userId,
-          productId,
-          quantity,
-        },
-      });
-    }
   }
 
   async updateCartItem(userId: number, productId: number, data: UpdateCartDto) {
@@ -105,6 +95,7 @@ export class CartService {
   }
 
   async removeFromCart(userId: number, productId: number) {
+    try {
     return this.prisma.cartItem.delete({
       where: {
         userId_productId: {
@@ -113,6 +104,10 @@ export class CartService {
         },
       },
     });
+    } catch {
+      // Jeśli nie znaleziono rekordu, zwróć null
+      return null;
+    }
   }
 
   async clearCart(userId: number) {

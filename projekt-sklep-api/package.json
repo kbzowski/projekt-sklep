@@ -19,8 +19,8 @@
     "db:migrate": "prisma migrate dev --create-only --name",
     "db:update": "prisma migrate deploy && prisma generate",
     "db:seed": "ts-node prisma/seed.ts",
-    "db:seed:test": "cross-env DATABASE_URL=file:./test.db ts-node prisma/seed-test.ts",
-    "db:reset:test": "ts-node scripts/reset-test-db.ts"
+    "db:seed:test": "ts-node prisma/seed-test.ts",
+    "db:reset:test": "ts-node prisma/reset-test-db.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.6",
