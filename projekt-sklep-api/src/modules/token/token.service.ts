@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+import { Role } from '../auth/role.enum';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -12,18 +13,32 @@ export class TokenService {
     private readonly prisma: PrismaService,
   ) {}
 
-  createAccessToken(userId: number): string {
-    return this.jwtService.sign({ sub: userId }, { expiresIn: '15m' });
-  }
-
-  // Test method - creates short-lived access token for testing
-  createShortAccessToken(userId: number): string {
-    return this.jwtService.sign({ sub: userId }, { expiresIn: '5s' });
+  /**
+   * Tworzy token dostępu (access token) JWT dla użytkownika.
+   *
+   * Token zawiera:
+   * - sub: ID użytkownika
+   * - role: Rola użytkownika (domyślnie USER)
+   * - exp: Czas wygaśnięcia (15 minut)
+   *
+   * Uwaga: Rola powinna być pobierana z bazy danych.
+   * Obecna implementacja używa domyślnej roli USER dla celów demonstracyjnych.
+   * Zadanie dla studentów: rozszerzyć model User o pole role i pobierać je z bazy.
+   *
+   * @param userId - ID użytkownika
+   * @param role - Rola użytkownika (domyślnie Role.USER)
+   * @returns Podpisany token JWT
+   */
+  createAccessToken(userId: number, role: Role = Role.USER): string {
+    return this.jwtService.sign(
+      { sub: userId, role },
+      { expiresIn: '15m' },
+    );
   }
 
   async createRefreshToken(userId: number): Promise<string> {
     const token = randomUUID();
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 dni
 
     await this.prisma.refreshToken.create({
       data: {
@@ -36,7 +51,19 @@ export class TokenService {
     return token;
   }
 
-  verifyToken(token: string): { sub: number } {
+  /**
+   * Weryfikuje token JWT i zwraca jego payload.
+   *
+   * Payload zawiera:
+   * - sub: ID użytkownika
+   * - role: Rola użytkownika
+   *
+   * @param token - Token JWT do weryfikacji
+   * @returns Payload tokenu z userId i rolą
+   * @throws JsonWebTokenError - gdy token jest nieprawidłowy
+   * @throws TokenExpiredError - gdy token wygasł
+   */
+  verifyToken(token: string): { sub: number; role: Role } {
     return this.jwtService.verify(token);
   }
 
@@ -51,26 +78,5 @@ export class TokenService {
     await this.prisma.refreshToken.delete({
       where: { token },
     });
-  }
-
-  async revokeAllRefreshTokens(userId: number): Promise<void> {
-    await this.prisma.refreshToken.deleteMany({
-      where: { userId },
-    });
-  }
-
-  async cleanExpiredTokens(): Promise<void> {
-    await this.prisma.refreshToken.deleteMany({
-      where: {
-        expiresAt: {
-          lt: new Date(),
-        },
-      },
-    });
-  }
-
-  // Legacy method for backward compatibility
-  createToken(userId: number): string {
-    return this.createAccessToken(userId);
   }
 }

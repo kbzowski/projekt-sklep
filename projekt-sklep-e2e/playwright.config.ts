@@ -1,72 +1,75 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright Configuration for Full-Stack E2E Testing
+ * Konfiguracja Playwright dla testów E2E całego stosu (Full-Stack)
  *
- * This is a standalone e2e test project that tests the entire application:
+ * Samodzielny projekt testów e2e testujący całą aplikację:
  * - Frontend (React + Vite)
  * - Backend (NestJS API)
- * - Database (SQLite)
+ * - Baza danych (SQLite)
  *
- * Educational concepts:
- * - Separation of e2e tests from application code
- * - Multi-server coordination
- * - Test isolation and database management
+ * Koncepcje edukacyjne:
+ * - Separacja testów e2e od kodu aplikacji
+ * - Koordynacja wielu serwerów
+ * - Izolacja testów i zarządzanie bazą danych
  */
 export default defineConfig({
-  // Test directory
+  // Katalog z testami
   testDir: './tests',
 
-  // Maximum time one test can run
+  // Global setup - resetuje test database przed testami
+  globalSetup: require.resolve('./globalSetup'),
+
+  // Maksymalny czas wykonania pojedynczego testu
   timeout: 30 * 1000,
 
-  // Run tests in files in parallel
+  // Uruchom pliki testowe równolegle
   fullyParallel: true,
 
-  // Fail the build on CI if you accidentally left test.only in the source code
+  // Zawiedź build na CI jeśli przypadkowo zostawiono test.only w kodzie
   forbidOnly: !!process.env.CI,
 
-  // Retry on CI only
+  // Ponów próby tylko na CI
   retries: process.env.CI ? 2 : 0,
 
-  // Number of workers (parallel test execution)
+  // Liczba workerów (równoległe wykonywanie testów)
   workers: process.env.CI ? 1 : undefined,
 
-  // Reporter to use
+  // Używane reportery
   reporter: [
     ['html'],
     ['list'],
   ],
 
-  // Shared settings for all projects
+  // Wspólne ustawienia dla wszystkich projektów
   use: {
-    // Base URL for page.goto('/')
+    // Bazowy URL dla page.goto('/')
     baseURL: 'http://localhost:5173',
 
-    // Collect trace when retrying the failed test
+    // Zbieraj trace podczas ponowienia nieudanego testu
     trace: 'on-first-retry',
 
-    // Screenshot on failure
+    // Screenshot przy błędzie
     screenshot: 'only-on-failure',
 
-    // Video on failure
+    // Video przy błędzie
     video: 'retain-on-failure',
 
-    // Maximum time for each action
+    // Maksymalny czas dla każdej akcji
     actionTimeout: 10 * 1000,
 
-    // Maximum time for each navigation
+    // Maksymalny czas dla każdej nawigacji
     navigationTimeout: 30 * 1000,
   },
 
-  // Configure projects for different browsers
+  // Konfiguracja projektów dla różnych przeglądarek
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
 
-    // Uncomment to test on more browsers
+    // Odkomentuj aby testować na innych przeglądarkach
     // {
     //   name: 'firefox',
     //   use: { ...devices['Desktop Firefox'] },
@@ -77,11 +80,11 @@ export default defineConfig({
     // },
   ],
 
-  // Run both frontend and backend servers before starting tests
+  // Uruchom serwery frontend i backend przed rozpoczęciem testów
   webServer: [
     {
-      // Backend API server (NestJS)
-      command: 'cd ../projekt-sklep-api && npm run start:dev',
+      // Serwer API (NestJS) - tryb testowy z test.db
+      command: 'cd ../projekt-sklep-api && npm run start:test',
       url: 'http://localhost:9000/api/products',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
@@ -89,7 +92,7 @@ export default defineConfig({
       stderr: 'pipe',
     },
     {
-      // Frontend dev server (Vite)
+      // Serwer deweloperski frontend (Vite)
       command: 'cd ../projekt-sklep-ui && npm run dev',
       url: 'http://localhost:5173',
       reuseExistingServer: !process.env.CI,

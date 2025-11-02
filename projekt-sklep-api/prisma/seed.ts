@@ -10,10 +10,8 @@ async function main() {
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
 
-  console.log('Cleared database');
-
   // Utwórz kategorię
-  const categories = await Promise.all([
+  await Promise.all([
     prisma.category.create({
       data: { id: 1, name: 'Elektronika', slug: 'elektronika' },
     }),
@@ -28,10 +26,8 @@ async function main() {
     }),
   ]);
 
-  console.log('Created categories:', categories.length);
-
   // Utwórz produkty
-  const products = await Promise.all([
+  await Promise.all([
     prisma.product.create({
       data: {
         id: 1,
@@ -134,13 +130,11 @@ async function main() {
     }),
   ]);
 
-  console.log('Created products:', products.length);
-
   // Utwórz użytkowników testowych
   const hashedPassword1 = await argon2.hash('admin123');
   const hashedPassword2 = await argon2.hash('user123');
 
-  const users = await Promise.all([
+  await Promise.all([
     prisma.user.create({
       data: {
         id: 1,
@@ -159,8 +153,6 @@ async function main() {
     }),
   ]);
 
-  console.log('Created users:', users.length);
-  console.log('Seed completed successfully!');
 }
 
 main()
