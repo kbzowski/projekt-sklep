@@ -22,8 +22,6 @@ export class ProductService {
     }
 
     // Wyszukiwanie po nazwie lub opisie
-    // SQLite: case-insensitive dla ASCII domyślnie
-    // Dla Unicode (polskie znaki): konwersja do lowercase po obu stronach
     if (search && search.trim()) {
       const searchLower = search.toLowerCase();
       where.OR = [
