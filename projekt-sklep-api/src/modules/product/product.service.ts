@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { Prisma } from '@prisma/client';
+import type { Prisma, Product } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -98,4 +98,37 @@ export class ProductService {
       description: product.description,
     };
   }
+
+  /**
+   * PRZYKŁAD wykorzystania bezpiecznego sparametryzowanych SQL z parametrami ($queryRaw) do pobrania produktów
+   */
+  async searchProductsRaw(searchTerm: string) {
+
+    // W przypadku sparametryzowanego zapytania SQL typy muszą być podane
+    type ProductResult = Pick<Product, 'id' | 'name' | 'price'>;
+
+    // Dla zaawansowanych: https://www.prisma.io/docs/orm/prisma-client/using-raw-sql/typedsql
+
+    return this.prisma.$queryRaw<ProductResult[]>`
+      SELECT id, name, price
+      FROM Product
+      WHERE name LIKE ${'%' + searchTerm + '%'}
+      ORDER BY name LIMIT 10
+    `;
+  }
+
+
+  /**
+   * PRZYKŁAD wykorzystania bezpiecznego $executeRaw dla operacji modyfikujących dane
+   */
+  async updateProductPriceRaw(productId: number, newPrice: number) {
+    const affectedRows = await this.prisma.$executeRaw`
+      UPDATE Product
+      SET price = ${newPrice}
+      WHERE id = ${productId}
+    `;
+
+    return { affectedRows };
+  }
+
 }
