@@ -4,14 +4,16 @@
 
 import { execSync } from 'child_process';
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+
+import { PrismaClient } from '../src/generated/prisma/client';
+
+const adapter = new PrismaBetterSqlite3({
+  url: 'file:./test.db',
+});
 
 const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: 'file:./test.db', // Zawsze używaj test.db
-    },
-  },
+  adapter,
 });
 
 async function resetTestDatabase() {

@@ -1,7 +1,15 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import * as argon2 from 'argon2';
 
-const prisma = new PrismaClient();
+import { PrismaClient } from '../src/generated/prisma/client';
+
+const adapter = new PrismaBetterSqlite3({
+  url: 'file:./dev.db',
+});
+
+const prisma = new PrismaClient({
+  adapter,
+});
 
 async function main() {
   // Wyczyść bazę danych

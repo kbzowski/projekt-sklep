@@ -1,69 +1,28 @@
 {
   "compilerOptions": {
-    // === System modułów i kompatybilność ===
-    // "commonjs" - używamy systemu modułów CommonJS (require/module.exports)
-    // Jest to standard w środowisku Node.js dla aplikacji backendowych
-    "module": "commonjs",
-
-    // Generuje pliki .d.ts z deklaracjami typów - przydatne przy tworzeniu bibliotek
-    // lub gdy inne projekty chcą używać naszych typów
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
     "declaration": true,
-
-    // Usuwa komentarze z skompilowanego kodu - zmniejsza rozmiar plików wynikowych
     "removeComments": true,
-
-    // === Wsparcie dla dekoratorów ===
-    // Dodaje metadane dla dekoratorów - wymagane przez NestJS i jego dependency injection
     "emitDecoratorMetadata": true,
-
-    // Włącza wsparcie dla dekoratorów (@Injectable, @Controller, @Get, etc.)
-    // NestJS intensywnie wykorzystuje dekoratory do konfiguracji aplikacji
     "experimentalDecorators": true,
-
-    // Pozwala na używanie domyślnych importów z modułów CommonJS (np. import express from 'express')
-    // Zamiast const express = require('express')
     "allowSyntheticDefaultImports": true,
-
-    // === Wersja JavaScript i kompilacja ===
-    // Kompiluje TypeScript do JavaScript ES2021 - nowoczesna wersja z async/await, Promise.any, etc.
-    "target": "ES2021",
-
-    // Generuje source maps - umożliwia debugowanie TypeScript bezpośrednio w przeglądarce/IDE
-    // Pokazuje numery linii z plików .ts zamiast .js podczas błędów
+    "target": "ES2023",
     "sourceMap": true,
-
-    // Katalog wyjściowy dla skompilowanych plików JavaScript
     "outDir": "./dist",
-
-    // Bazowa ścieżka do rozwiązywania importów - pozwala na import './services/user.service'
     "baseUrl": "./",
-
-    // Kompilacja przyrostowa - zapisuje informacje o poprzedniej kompilacji
-    // Przyspiesza kolejne buildy poprzez kompilację tylko zmienionych plików
     "incremental": true,
-
-    // Pomija sprawdzanie typów w plikach .d.ts z node_modules
-    // Znacznie przyspiesza kompilację, ponieważ nie sprawdza tysięcy plików zewnętrznych bibliotek
     "skipLibCheck": true,
-
-    // === Opcje sprawdzania typów (RELAKSOWANE dla kompatybilności z NestJS) ===
-    // Wyłączone strict checks - pozwala na używanie null/undefined bez jawnej obsługi
-    // W produkcyjnych projektach warto je włączyć, ale dla nauki są wyłączone
-    "strictNullChecks": false,
-
-    // Pozwala na niejawny typ 'any' - zmienna bez typu automatycznie dostaje 'any'
-    // Ułatwia naukę, ale w realnych projektach warto włączyć dla bezpieczeństwa typów
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
-
-    // Wyłączone ścisłe sprawdzanie bind/call/apply
     "strictBindCallApply": false,
-
-    // Wyłączone sprawdzanie wielkości liter w nazwach plików
-    // Linux rozróżnia wielkie/małe litery, Windows nie - może powodować problemy przy deploymencie
-    "forceConsistentCasingInFileNames": false,
-
-    // Wyłączone sprawdzanie czy każdy case w switch ma break lub return
-    // Zapobiega błędom gdy zapomnimy break i wykonanie "przejdzie" do kolejnego case
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@prisma/*": ["src/generated/prisma/*"],
+    }
   }
 }

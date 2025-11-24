@@ -8,7 +8,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 import { TokenService } from '../token/token.service';
 

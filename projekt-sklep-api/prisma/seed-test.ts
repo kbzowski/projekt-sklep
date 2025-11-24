@@ -1,6 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import * as argon2 from 'argon2';
 
+import { PrismaClient } from '../src/generated/prisma/client';
+ 
 /**
  * Test Database Seed Script
  *
@@ -8,12 +10,12 @@ import * as argon2 from 'argon2';
  * WAŻNE: dane muszą być zgodne z helpers/test-data.ts w projekt-sklep-e2e
  */
 
+const adapter = new PrismaBetterSqlite3({
+  url: 'file:./test.db',
+});
+
 const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: 'file:./test.db',
-    },
-  },
+  adapter,
 });
 
 async function main() {

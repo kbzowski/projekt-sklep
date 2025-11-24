@@ -3,7 +3,7 @@ import { User } from '@prisma/client';
 import * as argon2 from 'argon2';
 
 import { PrismaService } from '../prisma/prisma.service';
-
+ 
 @Injectable()
 export class AuthService {
   constructor(private readonly prisma: PrismaService) {}
